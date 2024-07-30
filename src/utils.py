@@ -1,12 +1,9 @@
+# utils.py
 import os
 import sys
-
-import numpy as np
-import pandas as pd
 import dill  # or pickle if dill is not necessary
 from sklearn.metrics import r2_score
 from sklearn.model_selection import GridSearchCV
-
 from src.exception import CustomException
 from src.logger import logging  # Ensure you have a logging setup in src.logger
 
@@ -33,19 +30,10 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params):
             gs.fit(X_train, y_train)
 
             best_model = gs.best_estimator_
-            best_model.fit(X_train, y_train)
-
-            y_train_pred = best_model.predict(X_train)
             y_test_pred = best_model.predict(X_test)
-
-            train_model_score = r2_score(y_train, y_train_pred)
             test_model_score = r2_score(y_test, y_test_pred)
 
-            report[model_name] = {
-                "train_score": train_model_score,
-                "test_score": test_model_score,
-                "best_params": gs.best_params_
-            }
+            report[model_name] = test_model_score
 
             logging.info(f"Completed evaluation for model: {model_name}")
 
