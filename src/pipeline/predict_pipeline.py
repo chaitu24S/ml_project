@@ -4,24 +4,28 @@ import pandas as pd
 from src.exception import CustomException
 from src.utils import load_object
 
-
 class PredictPipeline:
     def __init__(self):
         try:
             self.model_path = os.path.join("artifacts", "model.pkl")
-            self.preprocessor_path = os.path.join('artifacts', 'preprocessor.pkl')
+            self.preprocessor_path = os.path.join("artifacts", "preprocessor.pkl")
             self.model = load_object(file_path=self.model_path)
             self.preprocessor = load_object(file_path=self.preprocessor_path)
             print("Model and Preprocessor loaded successfully")
         except Exception as e:
+            print(f"Error loading model or preprocessor: {e}")
             raise CustomException(e, sys)
 
     def predict(self, features: pd.DataFrame) -> pd.Series:
         try:
+            print("Features before scaling:", features)
             data_scaled = self.preprocessor.transform(features)
+            print("Features after scaling:", data_scaled)
             preds = self.model.predict(data_scaled)
+            print("Predictions:", preds)
             return preds
         except Exception as e:
+            print(f"Error during prediction: {e}")
             raise CustomException(e, sys)
 
 
@@ -55,7 +59,9 @@ class CustomData:
                 "reading_score": [self.reading_score],
                 "writing_score": [self.writing_score],
             }
-
-            return pd.DataFrame(custom_data_input_dict)
+            df = pd.DataFrame(custom_data_input_dict)
+            print("DataFrame created from custom data:", df)
+            return df
         except Exception as e:
+            print(f"Error creating DataFrame from custom data: {e}")
             raise CustomException(e, sys)

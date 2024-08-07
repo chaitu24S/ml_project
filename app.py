@@ -1,24 +1,26 @@
 from flask import Flask, request, render_template
 import numpy as np
 import pandas as pd
-
 from src.pipeline.predict_pipeline import CustomData, PredictPipeline
 
 application = Flask(__name__)
 app = application
 
-## Route for home page
+# Route for home page
 @app.route('/')
 def index():
     return render_template('index.html')
 
-## Route for prediction
+# Route for prediction
 @app.route('/predictdata', methods=['GET', 'POST'])
 def predict_datapoint():
     if request.method == 'GET':
         return render_template('home.html')
     else:
         try:
+            # Debugging input data
+            print("Form Data:", request.form)
+
             data = CustomData(
                 gender=request.form.get('gender'),
                 race_ethnicity=request.form.get('ethnicity'),
@@ -29,13 +31,13 @@ def predict_datapoint():
                 writing_score=float(request.form.get('writing_score'))
             )
             pred_df = data.get_data_as_data_frame()
-            print(pred_df)
+            print("DataFrame:", pred_df)
             print("Before Prediction")
 
             predict_pipeline = PredictPipeline()
             print("Mid Prediction")
             results = predict_pipeline.predict(pred_df)
-            print("After Prediction")
+            print("After Prediction:", results)
             
             return render_template('home.html', results=results[0])
         except Exception as e:
@@ -43,4 +45,4 @@ def predict_datapoint():
             return render_template('home.html', results="An error occurred during prediction.")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", debug=True)
